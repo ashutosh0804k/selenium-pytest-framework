@@ -18,7 +18,7 @@ class ReqResClient:
         )
         if resp.status_code >= 400:
             # pytest shows captured stdout for failing tests, which makes CI failures easier to read
-            print(f"{method} {path} -> {resp.status_code}: {resp.text[:300]}")
+            print(f"{method} {path} -> {resp.status_code}: {resp.text[:1000]}")
         return resp
 
     def list_users(self, page=1):
