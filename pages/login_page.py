@@ -18,5 +18,9 @@ class LoginPage(BasePage):
         self.type(self.PASSWORD, password)
         self.click(self.LOGIN_BUTTON)
 
+    def is_displayed(self):
+        """Waits for the login form, so it is safe to call right after a redirect."""
+        return self.find(self.LOGIN_BUTTON).is_displayed()
+
     def error_message(self):
         return self.text_of(self.ERROR)

@@ -52,6 +52,7 @@ class InventoryPage(BasePage):
 
     def open_cart(self):
         self.click(self.CART_LINK)
+        self.wait_for_url_contains("cart")
 
     def logout(self):
         self.click(self.MENU_BUTTON)

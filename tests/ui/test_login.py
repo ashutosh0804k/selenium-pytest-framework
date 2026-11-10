@@ -34,4 +34,4 @@ def test_empty_password_shows_required_error(login_page):
 
 def test_logout_returns_to_login(inventory, login_page):
     inventory.logout()
-    assert login_page.is_present(login_page.LOGIN_BUTTON)
+    assert login_page.is_displayed()
