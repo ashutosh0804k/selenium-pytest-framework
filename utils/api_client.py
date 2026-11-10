@@ -13,9 +13,13 @@ class ReqResClient:
             self.session.headers["x-api-key"] = settings.REQRES_API_KEY
 
     def _request(self, method, path, **kwargs):
-        return self.session.request(
+        resp = self.session.request(
             method, self.base + path, timeout=settings.API_TIMEOUT, **kwargs
         )
+        if resp.status_code >= 400:
+            # pytest shows captured stdout for failing tests, which makes CI failures easier to read
+            print(f"{method} {path} -> {resp.status_code}: {resp.text[:300]}")
+        return resp
 
     def list_users(self, page=1):
         return self._request("GET", "/users", params={"page": page})
