@@ -50,6 +50,10 @@ class InventoryPage(BasePage):
         """value is one of: az, za, lohi, hilo"""
         Select(self.find(self.SORT_DROPDOWN)).select_by_value(value)
 
+    def open_first_item(self):
+        self.find_all(self.ITEM_NAMES)[0].click()
+        self.wait_for_url_contains("inventory-item")
+
     def open_cart(self):
         self.click(self.CART_LINK)
         self.wait_for_url_contains("cart")

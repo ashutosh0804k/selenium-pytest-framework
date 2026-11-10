@@ -4,6 +4,7 @@ from config import settings
 from pages.cart_page import CartPage
 from pages.checkout_page import CheckoutPage
 from pages.inventory_page import InventoryPage
+from pages.item_detail_page import ItemDetailPage
 from pages.login_page import LoginPage
 
 
@@ -19,6 +20,11 @@ def inventory(driver, login_page):
     page = InventoryPage(driver)
     assert page.is_loaded()
     return page
+
+
+@pytest.fixture
+def detail_page(driver):
+    return ItemDetailPage(driver)
 
 
 @pytest.fixture

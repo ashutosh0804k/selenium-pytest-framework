@@ -15,6 +15,7 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -r requirements.txt
+      # Serial on purpose: parallel calls would hit the ReqRes daily rate limit faster.
       - name: Run API tests
         run: pytest -m api --html=reports/api.html --self-contained-html
       - uses: actions/upload-artifact@v4
@@ -25,6 +26,10 @@ jobs:
 
   ui:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chrome, firefox]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -32,15 +37,17 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -r requirements.txt
-      - name: Run UI tests (headless Chrome)
+      - name: Run UI tests on ${{ matrix.browser }} (headless, parallel)
         env:
+          BROWSER: ${{ matrix.browser }}
           HEADLESS: "true"
           NO_SANDBOX: "true"
-        run: pytest -m ui --html=reports/ui.html --self-contained-html
+        run: pytest -m ui -n auto --html=reports/ui-${{ matrix.browser }}.html --self-contained-html
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: ui-report-and-screenshots
+          name: ui-${{ matrix.browser }}-report-and-screenshots
           path: |
             reports/
             screenshots/
+          if-no-files-found: ignore

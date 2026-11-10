@@ -71,6 +71,12 @@ def test_login_success_returns_token(api):
     assert "token" in resp.json()
 
 
+def test_login_unknown_user_fails(api):
+    resp = api.login({"email": "nobody@nowhere.test", "password": "whatever"})
+    assert resp.status_code == 400
+    assert "error" in resp.json()
+
+
 def test_login_without_password_fails(api):
     resp = api.login({"email": "peter@klaven"})
     assert resp.status_code == 400

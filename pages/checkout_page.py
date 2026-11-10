@@ -12,6 +12,17 @@ class CheckoutPage(BasePage):
     ERROR = (By.CSS_SELECTOR, "[data-test='error']")
     COMPLETE_HEADER = (By.CSS_SELECTOR, "[data-test='complete-header']")
 
+    CANCEL_BUTTON = (By.ID, "cancel")
+    SUBTOTAL = (By.CSS_SELECTOR, "[data-test='subtotal-label']")
+
+    def cancel(self):
+        self.click(self.CANCEL_BUTTON)
+        self.wait_for_url_contains("cart")
+
+    def subtotal(self):
+        """Parses 'Item total: $39.98' into 39.98"""
+        return float(self.text_of(self.SUBTOTAL).split("$")[1])
+
     def fill_info(self, first, last, postal):
         self.type(self.FIRST_NAME, first)
         self.type(self.LAST_NAME, last)

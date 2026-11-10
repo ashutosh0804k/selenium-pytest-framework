@@ -1,8 +1,10 @@
 import os
+import re
 
 import pytest
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
 
 from config import settings
 
@@ -15,9 +17,8 @@ def pytest_runtest_makereport(item, call):
     setattr(item, "rep_" + report.when, report)
 
 
-@pytest.fixture
-def driver(request):
-    options = Options()
+def build_chrome():
+    options = ChromeOptions()
     if settings.HEADLESS:
         options.add_argument("--headless=new")
     if settings.NO_SANDBOX:
@@ -33,12 +34,34 @@ def driver(request):
             "profile.password_manager_leak_detection": False,
         },
     )
+    return webdriver.Chrome(options=options)
 
-    browser = webdriver.Chrome(options=options)
+
+def build_firefox():
+    options = FirefoxOptions()
+    if settings.HEADLESS:
+        options.add_argument("-headless")
+    options.add_argument("--width=1920")
+    options.add_argument("--height=1080")
+    options.set_preference("signon.rememberSignons", False)
+    return webdriver.Firefox(options=options)
+
+
+BROWSERS = {"chrome": build_chrome, "firefox": build_firefox}
+
+
+@pytest.fixture
+def driver(request):
+    if settings.BROWSER not in BROWSERS:
+        raise pytest.UsageError(
+            f"BROWSER must be one of {sorted(BROWSERS)}, got '{settings.BROWSER}'"
+        )
+    browser = BROWSERS[settings.BROWSER]()
     yield browser
 
     failed = hasattr(request.node, "rep_call") and request.node.rep_call.failed
     if failed:
         os.makedirs("screenshots", exist_ok=True)
-        browser.save_screenshot(f"screenshots/{request.node.name}.png")
+        safe_name = re.sub(r"[^A-Za-z0-9_.-]+", "_", request.node.name)
+        browser.save_screenshot(f"screenshots/{settings.BROWSER}_{safe_name}.png")
     browser.quit()

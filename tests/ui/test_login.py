@@ -22,6 +22,25 @@ def test_wrong_password_shows_error(login_page):
     assert "do not match" in login_page.error_message()
 
 
+def test_problem_user_can_log_in(driver, login_page):
+    login_page.login("problem_user", settings.VALID_PASSWORD)
+    assert InventoryPage(driver).is_loaded()
+
+
+@pytest.mark.parametrize(
+    "username,password",
+    [
+        ("invalid_user", settings.VALID_PASSWORD),
+        ("STANDARD_USER", settings.VALID_PASSWORD),
+        (settings.STANDARD_USER, "SECRET_SAUCE"),
+        ("invalid_user", "wrong_password"),
+    ],
+)
+def test_invalid_credential_matrix(login_page, username, password):
+    login_page.login(username, password)
+    assert "do not match" in login_page.error_message()
+
+
 def test_empty_username_shows_required_error(login_page):
     login_page.login("", settings.VALID_PASSWORD)
     assert "Username is required" in login_page.error_message()
