@@ -38,13 +38,11 @@ HEADLESS=false pytest -m ui   # watch the browser
 pytest --html=reports/report.html --self-contained-html
 ```
 
-ReqRes now asks for a free API key. Get one at reqres.in and export it. Without it the API tests skip instead of failing:
+The classic ReqRes demo endpoints work without an API key, within a daily request limit. If you hit the limit, create a free key at app.reqres.in and export it. The client sends it as the `x-api-key` header:
 
 ```bash
 export REQRES_API_KEY=your_key
 ```
-
-For CI, add the same value as a repository secret named `REQRES_API_KEY`.
 
 ## Configuration
 
@@ -52,7 +50,7 @@ For CI, add the same value as a repository secret named `REQRES_API_KEY`.
 |---|---|---|
 | `UI_BASE_URL` | `https://www.saucedemo.com` | Site under test |
 | `API_BASE_URL` | `https://reqres.in/api` | API under test |
-| `REQRES_API_KEY` | empty | Sent as `x-api-key` |
+| `REQRES_API_KEY` | empty | Optional, sent as `x-api-key` |
 | `HEADLESS` | `true` | Run Chrome without a window |
 | `NO_SANDBOX` | `false` | Needed for Chrome in containers and CI |
 | `EXPLICIT_WAIT` | `10` | Seconds for Selenium waits |
