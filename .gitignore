@@ -1,11 +1,8 @@
 __pycache__/
-*.py[cod]
+*.pyc
 .pytest_cache/
-.ipynb_checkpoints/
-venv/
 .venv/
-env/
-.DS_Store
-Thumbs.db
-.idea/
-.vscode/
+venv/
+reports/
+screenshots/
+.env

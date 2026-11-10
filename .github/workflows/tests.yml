@@ -3,22 +3,46 @@ name: tests
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 jobs:
-  test:
+  api:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.12"
           cache: pip
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-      - name: Run tests
-        run: pytest -v
-      - name: Run backtest end to end
-        run: python -m spx_forecast.evaluate
+      - run: pip install -r requirements.txt
+      - name: Run API tests
+        env:
+          REQRES_API_KEY: ${{ secrets.REQRES_API_KEY }}
+        run: pytest -m api --html=reports/api.html --self-contained-html
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: api-report
+          path: reports/
+
+  ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Run UI tests (headless Chrome)
+        env:
+          HEADLESS: "true"
+          NO_SANDBOX: "true"
+        run: pytest -m ui --html=reports/ui.html --self-contained-html
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ui-report-and-screenshots
+          path: |
+            reports/
+            screenshots/
